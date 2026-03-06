@@ -33,9 +33,16 @@ class BestSellerService
         $cacheKey = self::CACHE_KEY . '_' . $limit;
 
         if ($useCache) {
-            return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($limit) {
+            try {
+                return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($limit) {
+                    return $this->computeBestSellers($limit);
+                });
+            } catch (\Throwable $e) {
+                // Cache store may be misconfigured (e.g. database cache table missing).
+                // Log and fall back to computing without cache to avoid 500 errors.
+                logger()->error('BestSellerService cache error: ' . $e->getMessage());
                 return $this->computeBestSellers($limit);
-            });
+            }
         }
 
         return $this->computeBestSellers($limit);

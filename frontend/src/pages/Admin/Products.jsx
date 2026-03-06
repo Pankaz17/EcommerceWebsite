@@ -88,9 +88,15 @@ const AdminProducts = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {product.image && (
                     <img
-                      src={`http://localhost:8000/storage/${product.image}`}
+                      src={`http://127.0.0.1:8000/storage/${product.image}`}
                       alt={product.name}
                       className="h-16 w-16 object-cover rounded"
+                      onError={(e) => {
+                        console.warn('Image failed to load:', e.target.src)
+                        e.target.onerror = null
+                        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-size="10" fill="#9ca3af" dominant-baseline="middle" text-anchor="middle">No image</text></svg>'
+                        e.target.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
+                      }}
                     />
                   )}
                 </td>

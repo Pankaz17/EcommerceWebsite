@@ -61,7 +61,7 @@ const AdminProductForm = () => {
       })
       if (product.image) {
         setImagePreview(
-          `http://localhost:8000/storage/${product.image}`
+          `http://127.0.0.1:8000/storage/${product.image}`
         )
       }
     } catch (error) {

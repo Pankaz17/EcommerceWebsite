@@ -198,8 +198,34 @@ class ProductSeeder extends Seeder
             ],
         ];
 
+        $images = [
+            '95QXC95yeXdBJLS2459MS4YGXHjoHyl870pseHkm.webp',
+            'cp0UOJKznmRLmH61V48u9mzKM7jfhWG3se8ww55O.jpg',
+            'CZaLe0Zn5ajxo7FdeDoq8LGfUWAsXzBcdgkS7aX0.jpg',
+            'DMEOpWjYr9CNT7cId6rzd17B6xNEXFC12e5W6rZu.jpg',
+            'fiyFpV7J0DvM41gz6LcpOopHGHYJEsIv65Ddi7hc.jpg',
+            'I2bDP3bBeox8thMrMXiNqPzygZnyTNMaharwGwi4.webp',
+            'jDQpJOyIejHFPaXWh93AjKNpa2Swem1Uapa0W7oL.webp',
+            'NqsSIf6zXYduHoXMz9ZlVi5WN8qbIi2la14lB0Lw.webp',
+            'nXNKLNs8dz1oBy8sqMxBd2cTLyNeFTOJ1LjhycRd.webp',
+            'oIZ3ROJIZ15KRtMH8V2hE2XnrKi6wZqhrzY6ZuNF.webp',
+            'rS01FezIio2X9nGF5rcNOBgrJSYwreo4xwskVrQ7.webp',
+            'slj14HW3v2AtrCN8l7jtZJcgU0ifNZT3EQVxzALF.jpg',
+            'TFTPLe2d5cjF0ZyrMBSAPebMoZhHCm4dcdaEwANm.jpg',
+            'U9MeoCevBtTpItIzoPxSsiudcqFPQWaeEkln70qw.webp',
+            'x3RMrX7xOIgn1iAodepQJspFDHM3EWlcMQWAYamU.jpg',
+            'xIJEFpFRKnPt3tQHOfTCOOqrvZOFhX3KLmaAHTzP.jpg',
+            'ZsfSIKlBAm53SCtJXMqMGoJ0HlZ9zUEc3O9VWVyH.jpg'
+        ];
+
+        $i = 0;
         foreach ($products as $product) {
+            if (!isset($product['image']) || empty($product['image'])) {
+                // stored files are under storage/app/public/products, so store path accordingly
+                $product['image'] = 'products/' . $images[$i % count($images)];
+            }
             Product::create($product);
+            $i++;
         }
     }
 }

@@ -90,11 +90,17 @@ const ProductDetail = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           {product.image && (
-            <img
-              src={`http://localhost:8000/storage/${product.image}`}
-              alt={product.name}
-              className="w-full rounded-lg shadow-lg"
-            />
+              <img
+                src={`http://127.0.0.1:8000/storage/${product.image}`}
+                alt={product.name}
+                className="w-full rounded-lg shadow-lg"
+                onError={(e) => {
+                  console.warn('Image failed to load:', e.target.src)
+                  e.target.onerror = null
+                  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-size="24" fill="#9ca3af" dominant-baseline="middle" text-anchor="middle">Image unavailable</text></svg>'
+                  e.target.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
+                }}
+              />
           )}
         </div>
         <div>
@@ -188,12 +194,18 @@ const ProductDetail = () => {
                 to={`/products/${rec.id}`}
                 className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition"
               >
-                {rec.image && (
-                  <img
-                    src={`http://localhost:8000/storage/${rec.image}`}
-                    alt={rec.name}
-                    className="w-full h-40 object-cover group-hover:scale-105 transition"
-                  />
+                  {rec.image && (
+                    <img
+                      src={`http://127.0.0.1:8000/storage/${rec.image}`}
+                      alt={rec.name}
+                      className="w-full h-40 object-cover group-hover:scale-105 transition"
+                      onError={(e) => {
+                        console.warn('Image failed to load:', e.target.src)
+                        e.target.onerror = null
+                        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-size="16" fill="#9ca3af" dominant-baseline="middle" text-anchor="middle">Image unavailable</text></svg>'
+                        e.target.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
+                      }}
+                    />
                 )}
                 <div className="p-3">
                   <p className="font-semibold text-gray-900 truncate group-hover:text-blue-600">
