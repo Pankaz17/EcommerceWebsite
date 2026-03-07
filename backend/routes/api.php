@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\EsewaPaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -26,6 +27,14 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// eSewa payment callbacks (public – eSewa sandbox redirects here)
+Route::get('/payment/esewa/success/{order_id}', [EsewaPaymentController::class, 'success'])->name('esewa.success');
+Route::get('/payment/esewa/failure/{order_id}', [EsewaPaymentController::class, 'failure'])->name('esewa.failure');
+
+// eSewa debug endpoint (public - for testing only)
+Route::get('/payment/esewa/test-signature', [EsewaPaymentController::class, 'testSignature']);
+Route::post('/payment/esewa/test-order/{orderId}', [EsewaPaymentController::class, 'testOrderSignature']);
+
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
@@ -42,6 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders', [OrderController::class, 'store']);
+
+    // eSewa payment initiation (user only)
+    Route::post('/payment/esewa/initiate/{order}', [EsewaPaymentController::class, 'initiate']);
 
     // Admin routes
     Route::middleware('admin')->group(function () {

@@ -11,6 +11,9 @@ import ProductDetail from './pages/ProductDetail'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import Cart from './pages/Cart'
+import EsewaSuccess from './pages/EsewaSuccess'
+import EsewaFailure from './pages/EsewaFailure'
+import EsewaCallback from './pages/EsewaCallback'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
 import AdminDashboard from './pages/Admin/Dashboard'
@@ -58,6 +61,11 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* eSewa: callback receives redirect from eSewa (may have payload in fragment), then forwards to backend */}
+            <Route path="/payment/esewa/callback" element={<EsewaCallback />} />
+            <Route path="/payment/esewa/success" element={<EsewaSuccess />} />
+            <Route path="/payment/esewa/failure" element={<EsewaFailure />} />
             
             <Route
               path="/admin"

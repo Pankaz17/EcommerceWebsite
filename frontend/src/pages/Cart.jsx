@@ -58,11 +58,44 @@ const Cart = () => {
     e.preventDefault()
     try {
       const response = await api.post('/orders', orderData)
+      const createdOrder = response.data.order
+
+      // If payment method is eSewa, initiate real sandbox payment flow
+      if (orderData.payment_method === 'esewa') {
+        const initRes = await api.post(
+          `/payment/esewa/initiate/${createdOrder.id}`
+        )
+
+        const { payment_url: paymentUrl, params } = initRes.data || {}
+
+        if (!paymentUrl || !params) {
+          throw new Error('Unable to initiate eSewa payment.')
+        }
+
+        // Create a form and submit via POST to eSewa sandbox
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = paymentUrl
+
+        Object.entries(params).forEach(([key, value]) => {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = key
+          input.value = value
+          form.appendChild(input)
+        })
+
+        document.body.appendChild(form)
+        form.submit()
+        return
+      }
+
+      // Default flow for COD and dummy payment
       setMessage('Order placed successfully!')
       setShowCheckout(false)
       fetchCart()
       setTimeout(() => {
-        navigate(`/orders/${response.data.order.id}`)
+        navigate(`/orders/${createdOrder.id}`)
       }, 2000)
     } catch (error) {
       setMessage(

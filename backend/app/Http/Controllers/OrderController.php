@@ -118,8 +118,10 @@ class OrderController extends Controller
             'status' => 'pending',
         ];
 
-        // For dummy and eSewa, immediately mark as paid (simple simulation)
-        if (in_array($paymentMethod, ['dummy', 'esewa'], true)) {
+        // For dummy payments, immediately mark as paid (simple simulation).
+        // For eSewa, we keep status as 'pending' and complete it via the
+        // eSewa sandbox callback and verification flow.
+        if ($paymentMethod === 'dummy') {
             $paymentData['status'] = 'paid';
             $paymentData['paid_at'] = now();
 
