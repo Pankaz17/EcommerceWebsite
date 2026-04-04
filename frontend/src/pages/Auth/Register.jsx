@@ -50,18 +50,23 @@ const Register = () => {
     }
   }
 
+  const inputClass =
+    'w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 focus:border-amber-500/50 outline-none'
+
   return (
     <div className="max-w-md mx-auto mt-8">
-      <div className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
+      <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl px-8 pt-8 pb-8 shadow-xl">
+        <h2 className="font-display text-2xl font-bold mb-6 text-center text-zinc-100">
+          Join StrideLab
+        </h2>
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-950/80 border border-red-900 text-red-300 px-4 py-3 rounded-xl mb-4 text-sm">
             {error}
           </div>
         )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-zinc-400 text-sm font-semibold mb-2">
               Name
             </label>
             <input
@@ -70,12 +75,12 @@ const Register = () => {
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className={inputClass}
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-zinc-400 text-sm font-semibold mb-2">
               Email
             </label>
             <input
@@ -84,12 +89,12 @@ const Register = () => {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className={inputClass}
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-zinc-400 text-sm font-semibold mb-2">
               Password
             </label>
             <input
@@ -98,13 +103,13 @@ const Register = () => {
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className={inputClass}
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Confirm Password
+            <label className="block text-zinc-400 text-sm font-semibold mb-2">
+              Confirm password
             </label>
             <input
               type="password"
@@ -115,13 +120,13 @@ const Register = () => {
                   password_confirmation: e.target.value,
                 })
               }
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className={inputClass}
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Phone (Optional)
+            <label className="block text-zinc-400 text-sm font-semibold mb-2">
+              Phone (optional)
             </label>
             <input
               type="tel"
@@ -129,34 +134,34 @@ const Register = () => {
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
               }
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className={inputClass}
             />
           </div>
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Address (Optional)
+            <label className="block text-zinc-400 text-sm font-semibold mb-2">
+              Address (optional)
             </label>
             <textarea
               value={formData.address}
               onChange={(e) =>
                 setFormData({ ...formData, address: e.target.value })
               }
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className={inputClass}
               rows="3"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline disabled:bg-gray-400"
+            className="w-full bg-amber-500 text-zinc-950 font-semibold py-3 px-4 rounded-xl hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-zinc-500 transition-colors"
           >
-            {loading ? 'Registering...' : 'Register'}
+            {loading ? 'Creating account…' : 'Create account'}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm">
+        <p className="mt-6 text-center text-sm text-zinc-500">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Login here
+          <Link to="/login" className="text-amber-500 hover:text-amber-400 font-medium">
+            Sign in
           </Link>
         </p>
       </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import api from '../services/api'
+import { productImageUrl } from '../utils/productImage'
 
 const OrderDetail = () => {
   const { id } = useParams()
@@ -39,25 +40,29 @@ const OrderDetail = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-zinc-700 border-t-amber-500"></div>
       </div>
     )
   }
 
   if (!order) {
-    return <div>Order not found</div>
+    return (
+      <div className="text-zinc-400 text-center py-12">
+        Order not found
+      </div>
+    )
   }
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">
+      <h1 className="font-display text-3xl font-bold mb-6 text-zinc-100">
         Order #{order.order_number}
       </h1>
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <h3 className="font-semibold mb-2">Payment Status</h3>
+            <h3 className="font-semibold mb-2 text-zinc-300">Payment status</h3>
             <span
               className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
                 order.payment_status
@@ -67,7 +72,7 @@ const OrderDetail = () => {
             </span>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">Delivery Status</h3>
+            <h3 className="font-semibold mb-2 text-zinc-300">Delivery status</h3>
             <span
               className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
                 order.delivery_status
@@ -79,45 +84,45 @@ const OrderDetail = () => {
         </div>
 
         <div className="mb-4">
-          <h3 className="font-semibold mb-2">Shipping Address</h3>
-          <p className="text-gray-600">{order.shipping_address}</p>
+          <h3 className="font-semibold mb-2 text-zinc-300">Shipping address</h3>
+          <p className="text-zinc-400">{order.shipping_address}</p>
         </div>
 
         {order.phone && (
           <div className="mb-4">
-            <h3 className="font-semibold mb-2">Phone</h3>
-            <p className="text-gray-600">{order.phone}</p>
+            <h3 className="font-semibold mb-2 text-zinc-300">Phone</h3>
+            <p className="text-zinc-400">{order.phone}</p>
           </div>
         )}
 
         {order.notes && (
           <div className="mb-4">
-            <h3 className="font-semibold mb-2">Notes</h3>
-            <p className="text-gray-600">{order.notes}</p>
+            <h3 className="font-semibold mb-2 text-zinc-300">Notes</h3>
+            <p className="text-zinc-400">{order.notes}</p>
           </div>
         )}
 
         <div className="border-t pt-4">
-          <p className="text-2xl font-bold text-right">
+          <p className="text-2xl font-bold text-right text-amber-400">
             Total: ${order.total_amount}
           </p>
         </div>
       </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-2xl font-bold mb-4">Order Items</h2>
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 mb-6">
+        <h2 className="font-display text-2xl font-bold mb-4 text-zinc-100">Items</h2>
         <div className="space-y-4">
           {order.order_items?.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between border-b pb-4"
+              className="flex items-center justify-between border-b border-zinc-800 pb-4"
             >
               <div className="flex items-center space-x-4">
                 {item.product.image && (
                   <img
-                    src={`http://127.0.0.1:8000/storage/${item.product.image}`}
+                    src={productImageUrl(item.product.image)}
                     alt={item.product.name}
-                    className="w-20 h-20 object-cover rounded"
+                    className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
                     onError={(e) => {
                       console.warn('Image failed to load:', e.target.src)
                       e.target.onerror = null
@@ -127,15 +132,15 @@ const OrderDetail = () => {
                   />
                 )}
                 <div>
-                  <h3 className="font-semibold">{item.product.name}</h3>
-                  <p className="text-gray-600">
+                  <h3 className="font-semibold text-zinc-100">{item.product.name}</h3>
+                  <p className="text-zinc-500 text-sm">
                     {item.selected_size && `Size: ${item.selected_size} `}
                     {item.selected_color && `Color: ${item.selected_color}`}
                   </p>
-                  <p className="text-gray-600">Quantity: {item.quantity}</p>
+                  <p className="text-zinc-500 text-sm">Qty: {item.quantity}</p>
                 </div>
               </div>
-              <p className="font-bold">
+              <p className="font-bold text-zinc-100">
                 ${(item.quantity * item.price).toFixed(2)}
               </p>
             </div>

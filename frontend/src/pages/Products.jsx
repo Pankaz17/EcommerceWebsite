@@ -1,22 +1,30 @@
-import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import api from '../services/api'
-import OfferBanner from '../components/OfferBanner'
+import PromoCarousel from '../components/PromoCarousel'
+import ShoeCard from '../components/ShoeCard'
+import { productImageUrl } from '../utils/productImage'
+import { SHOE_SIZES, SHOE_COLORS } from '../constants/shoeFilters'
 
 const Products = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [brands, setBrands] = useState([])
   const [categories, setCategories] = useState([])
-  const [search, setSearch] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [filters, setFilters] = useState({
-    brand: '',
-    category: '',
-  })
+  const initialQ = searchParams.get('search') || ''
+  const [search, setSearch] = useState(initialQ)
+  const [debouncedSearch, setDebouncedSearch] = useState(initialQ)
+  const [filters, setFilters] = useState(() => ({
+    brand: searchParams.get('brand') || '',
+    category: searchParams.get('category') || '',
+    size: searchParams.get('size') || '',
+    color: searchParams.get('color') || '',
+  }))
+  const [bestSellers, setBestSellers] = useState([])
   const debounceTimer = useRef(null)
+  const bestSellersScrollRef = useRef(null)
 
-  // Fetch brands and categories on mount
   useEffect(() => {
     const fetchBrandsAndCategories = async () => {
       try {
@@ -24,8 +32,8 @@ const Products = () => {
           api.get('/brands'),
           api.get('/categories'),
         ])
-        setBrands(brandsRes.data.filter((b) => b.status === 'active'))
-        setCategories(categoriesRes.data.filter((c) => c.status === 'active'))
+        setBrands(brandsRes.data.filter((x) => x.status === 'active'))
+        setCategories(categoriesRes.data.filter((x) => x.status === 'active'))
       } catch (error) {
         console.error('Error fetching brands/categories:', error)
       }
@@ -33,24 +41,42 @@ const Products = () => {
     fetchBrandsAndCategories()
   }, [])
 
-  // Debounce search input
   useEffect(() => {
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current)
-    }
+    api
+      .get('/products/best-sellers?limit=10')
+      .then((res) => {
+        setBestSellers(res.data.data || [])
+      })
+      .catch(() => {})
+  }, [])
 
-    debounceTimer.current = setTimeout(() => {
-      setDebouncedSearch(search)
-    }, 500) // Wait 500ms after user stops typing
+  const bestSellerIdSet = useMemo(() => {
+    const s = new Set()
+    bestSellers.forEach(({ product: p }) => {
+      if (p?.id) s.add(p.id)
+    })
+    return s
+  }, [bestSellers])
 
+  useEffect(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    debounceTimer.current = setTimeout(() => setDebouncedSearch(search), 450)
     return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current)
-      }
+      if (debounceTimer.current) clearTimeout(debounceTimer.current)
     }
   }, [search])
 
-  // Fetch products when debouncedSearch or filters change
+  // Sync filters to URL (shareable links)
+  useEffect(() => {
+    const next = new URLSearchParams()
+    if (debouncedSearch) next.set('search', debouncedSearch)
+    if (filters.brand) next.set('brand', filters.brand)
+    if (filters.category) next.set('category', filters.category)
+    if (filters.size) next.set('size', filters.size)
+    if (filters.color) next.set('color', filters.color)
+    setSearchParams(next, { replace: true })
+  }, [debouncedSearch, filters, setSearchParams])
+
   useEffect(() => {
     fetchProducts()
   }, [debouncedSearch, filters])
@@ -62,6 +88,8 @@ const Products = () => {
       if (debouncedSearch) params.append('search', debouncedSearch)
       if (filters.brand) params.append('brand', filters.brand)
       if (filters.category) params.append('category', filters.category)
+      if (filters.size) params.append('size', filters.size)
+      if (filters.color) params.append('color', filters.color)
 
       const response = await api.get(`/products?${params.toString()}`)
       setProducts(response.data.data || response.data)
@@ -72,93 +100,216 @@ const Products = () => {
     }
   }
 
-  return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Products</h1>
+  const scrollBestSellers = (direction) => {
+    if (bestSellersScrollRef.current) {
+      const scrollAmount = 320
+      bestSellersScrollRef.current.scrollBy({
+        left: direction === 'prev' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      })
+    }
+  }
 
-      <div className="mb-6 space-y-4 md:flex md:space-y-0 md:space-x-4">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-        <select
-          value={filters.brand}
-          onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
-          className="w-full md:w-1/4 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">All Brands</option>
-          {brands.map((brand) => (
-            <option key={brand.id} value={brand.name}>
-              {brand.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filters.category}
-          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-          className="w-full md:w-1/4 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">All Categories</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.name}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+  const clearFilters = () => {
+    setFilters({ brand: '', category: '', size: '', color: '' })
+    setSearch('')
+    setDebouncedSearch('')
+    setSearchParams(new URLSearchParams())
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-10">
+        <p className="text-xs uppercase tracking-[0.3em] text-amber-500 mb-2">
+          Shop
+        </p>
+        <h1 className="font-display text-4xl font-bold text-zinc-100 tracking-tight">
+          Footwear
+        </h1>
+        <p className="text-zinc-500 mt-2 max-w-2xl">
+          Filter by size, brand, color, and shoe type. Search by name or keyword.
+        </p>
       </div>
 
-      {/* Offer Banner - Auto-sliding */}
-      <OfferBanner />
+      <div className="mb-8 space-y-4">
+        <input
+          type="search"
+          placeholder="Search shoes, brands, materials…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-xl border border-zinc-700 bg-zinc-900/50 px-4 py-3.5 text-zinc-100 placeholder-zinc-500 focus:border-amber-500/60 focus:ring-2 focus:ring-amber-500/20 outline-none transition-shadow"
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <select
+            value={filters.size}
+            onChange={(e) =>
+              setFilters({ ...filters, size: e.target.value })
+            }
+            className="rounded-xl border border-zinc-700 bg-zinc-900/50 px-4 py-3 text-zinc-100 focus:border-amber-500/60 outline-none"
+          >
+            <option value="">Size (US)</option>
+            {SHOE_SIZES.map((sz) => (
+              <option key={sz} value={sz}>
+                {sz}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.brand}
+            onChange={(e) =>
+              setFilters({ ...filters, brand: e.target.value })
+            }
+            className="rounded-xl border border-zinc-700 bg-zinc-900/50 px-4 py-3 text-zinc-100 focus:border-amber-500/60 outline-none"
+          >
+            <option value="">All brands</option>
+            {brands.map((brand) => (
+              <option key={brand.id} value={brand.name}>
+                {brand.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.color}
+            onChange={(e) =>
+              setFilters({ ...filters, color: e.target.value })
+            }
+            className="rounded-xl border border-zinc-700 bg-zinc-900/50 px-4 py-3 text-zinc-100 focus:border-amber-500/60 outline-none"
+          >
+            <option value="">All colors</option>
+            {SHOE_COLORS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filters.category}
+            onChange={(e) =>
+              setFilters({ ...filters, category: e.target.value })
+            }
+            className="rounded-xl border border-zinc-700 bg-zinc-900/50 px-4 py-3 text-zinc-100 focus:border-amber-500/60 outline-none"
+          >
+            <option value="">Shoe type</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          type="button"
+          onClick={clearFilters}
+          className="text-sm text-zinc-500 hover:text-amber-400 transition-colors"
+        >
+          Clear all filters
+        </button>
+      </div>
+
+      <PromoCarousel />
+
+      {bestSellers.length > 0 && (
+        <section className="mt-4 mb-14 pt-10 border-t border-zinc-800">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-display text-2xl font-bold text-zinc-100">
+              Best sellers
+            </h2>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => scrollBestSellers('prev')}
+                className="rounded-lg border border-zinc-600 p-2 text-zinc-300 hover:bg-zinc-800 transition"
+                aria-label="Previous"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollBestSellers('next')}
+                className="rounded-lg border border-zinc-600 p-2 text-zinc-300 hover:bg-zinc-800 transition"
+                aria-label="Next"
+              >
+                →
+              </button>
+            </div>
+          </div>
+          <div
+            ref={bestSellersScrollRef}
+            className="flex gap-4 overflow-x-auto pb-3 scrollbar-thin"
+            style={{ scrollBehavior: 'smooth' }}
+          >
+            {bestSellers.slice(0, 10).map(({ product: bestProduct, total_sold }) =>
+              bestProduct ? (
+                <Link
+                  key={bestProduct.id}
+                  to={`/products/${bestProduct.id}`}
+                  className="group flex-shrink-0 w-44 rounded-2xl border border-zinc-700 bg-zinc-900/40 overflow-hidden hover:border-amber-500/40 transition"
+                >
+                  {bestProduct.image && (
+                    <img
+                      src={productImageUrl(bestProduct.image)}
+                      alt={bestProduct.name}
+                      className="h-44 w-full object-cover group-hover:scale-105 transition duration-500"
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src =
+                          'data:image/svg+xml,' +
+                          encodeURIComponent(
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="#27272a" width="100%" height="100%"/></svg>'
+                          )
+                      }}
+                    />
+                  )}
+                  <div className="p-3">
+                    <p className="font-semibold text-zinc-100 truncate text-sm group-hover:text-amber-400">
+                      {bestProduct.name}
+                    </p>
+                    <p className="text-amber-400 font-bold">
+                      ${bestProduct.price}
+                    </p>
+                    <p className="text-[11px] text-zinc-500">{total_sold} sold</p>
+                  </div>
+                </Link>
+              ) : null
+            )}
+          </div>
+        </section>
+      )}
 
       {loading && products.length === 0 ? (
         <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-zinc-700 border-t-amber-500" />
         </div>
       ) : (
         <>
           {loading && (
-            <div className="flex justify-center items-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-gray-600">Searching...</span>
+            <div className="flex justify-center items-center py-6 gap-3 text-zinc-500">
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-700 border-t-amber-500" />
+              <span>Updating…</span>
             </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
             {products.map((product) => (
-              <Link
+              <ShoeCard
                 key={product.id}
-                to={`/products/${product.id}`}
-                className="bg-white/95 rounded-2xl shadow-lg overflow-hidden transition-transform transition-shadow duration-200 hover:shadow-2xl hover:-translate-y-1"
-              >
-                {product.image && (
-                  <img
-                    src={`http://127.0.0.1:8000/storage/${product.image}`}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                    onError={(e) => {
-                      console.warn('Image failed to load:', e.target.src)
-                      e.target.onerror = null
-                      const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-size="20" fill="#9ca3af" dominant-baseline="middle" text-anchor="middle">Image unavailable</text></svg>'
-                      e.target.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
-                    }}
-                  />
-                )}
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{product.brand}</p>
-                  <p className="text-blue-600 font-bold text-xl">
-                    ${product.price}
-                  </p>
-                </div>
-              </Link>
+                product={product}
+                bestSellerIds={bestSellerIdSet}
+              />
             ))}
           </div>
 
           {!loading && products.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No products found</p>
+            <div className="text-center py-20 rounded-2xl border border-dashed border-zinc-700">
+              <p className="text-zinc-500 text-lg">No shoes match those filters.</p>
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-4 text-amber-500 font-semibold hover:underline"
+              >
+                Reset filters
+              </button>
             </div>
           )}
         </>
@@ -168,4 +319,3 @@ const Products = () => {
 }
 
 export default Products
-

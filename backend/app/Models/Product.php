@@ -23,6 +23,8 @@ class Product extends Model
         'category',
         'size',
         'color',
+        'material',
+        'sole_type',
         'stock_quantity',
         'status',
     ];

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../../services/api'
+import { productImageUrl } from '../../utils/productImage'
 
 const AdminProductForm = () => {
   const { id } = useParams()
@@ -18,6 +19,8 @@ const AdminProductForm = () => {
     category: '',
     size: '',
     color: '',
+    material: '',
+    sole_type: '',
     stock_quantity: '',
     status: 'active',
   })
@@ -56,13 +59,13 @@ const AdminProductForm = () => {
         category: product.category || '',
         size: product.size || '',
         color: product.color || '',
+        material: product.material || '',
+        sole_type: product.sole_type || '',
         stock_quantity: product.stock_quantity || '',
         status: product.status || 'active',
       })
       if (product.image) {
-        setImagePreview(
-          `http://127.0.0.1:8000/storage/${product.image}`
-        )
+        setImagePreview(productImageUrl(product.image))
       }
     } catch (error) {
       console.error('Error fetching product:', error)
@@ -236,7 +239,7 @@ const AdminProductForm = () => {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Sizes (JSON array or comma-separated)
+              Sizes (JSON, e.g. US men’s)
             </label>
             <input
               type="text"
@@ -244,7 +247,7 @@ const AdminProductForm = () => {
               onChange={(e) =>
                 setFormData({ ...formData, size: e.target.value })
               }
-              placeholder='["XS", "S", "M", "L", "XL"] or XS,S,M,L,XL or Free Size'
+              placeholder='["7","8","9"] or 7,8,9'
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
@@ -258,6 +261,37 @@ const AdminProductForm = () => {
               onChange={(e) =>
                 setFormData({ ...formData, color: e.target.value })
               }
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Upper / material
+            </label>
+            <input
+              type="text"
+              value={formData.material}
+              onChange={(e) =>
+                setFormData({ ...formData, material: e.target.value })
+              }
+              placeholder="Mesh, leather, knit…"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Sole type
+            </label>
+            <input
+              type="text"
+              value={formData.sole_type}
+              onChange={(e) =>
+                setFormData({ ...formData, sole_type: e.target.value })
+              }
+              placeholder="Rubber, EVA, carbon plate…"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>

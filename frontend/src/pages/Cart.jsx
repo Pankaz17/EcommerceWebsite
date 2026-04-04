@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import api from '../services/api'
 import { useCart } from '../contexts/CartContext'
+import { productImageUrl } from '../utils/productImage'
 
 const Cart = () => {
   const navigate = useNavigate()
@@ -107,14 +108,14 @@ const Cart = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-zinc-700 border-t-amber-500"></div>
       </div>
     )
   }
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
+      <h1 className="font-display text-3xl font-bold mb-6 text-zinc-100">Cart</h1>
 
       {message && (
         <div
@@ -129,29 +130,29 @@ const Cart = () => {
       )}
 
       {cart.cart_items.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg mb-4">Your cart is empty</p>
+        <div className="text-center py-12 rounded-2xl border border-dashed border-zinc-700">
+          <p className="text-zinc-500 text-lg mb-4">Your cart is empty</p>
           <Link
             to="/products"
-            className="text-blue-600 hover:underline font-semibold"
+            className="text-amber-500 hover:text-amber-400 font-semibold"
           >
-            Browse Products
+            Browse shoes
           </Link>
         </div>
       ) : (
         <>
-          <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden mb-6">
             {cart.cart_items.map((item) => (
               <div
                 key={item.id}
-                className="border-b border-gray-200 p-4 flex items-center justify-between"
+                className="border-b border-zinc-800 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
               >
                 <div className="flex items-center space-x-4 flex-1">
                   {item.product.image && (
                     <img
-                      src={`http://127.0.0.1:8000/storage/${item.product.image}`}
+                      src={productImageUrl(item.product.image)}
                       alt={item.product.name}
-                      className="w-20 h-20 object-cover rounded"
+                      className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
                       onError={(e) => {
                           console.warn('Image failed to load:', e.target.src)
                           e.target.onerror = null
@@ -163,15 +164,15 @@ const Cart = () => {
                   <div>
                     <Link
                       to={`/products/${item.product.id}`}
-                      className="font-semibold text-lg hover:text-blue-600"
+                      className="font-semibold text-lg text-zinc-100 hover:text-amber-400"
                     >
                       {item.product.name}
                     </Link>
-                    <p className="text-gray-600">
+                    <p className="text-zinc-500 text-sm">
                       {item.selected_size && `Size: ${item.selected_size} `}
                       {item.selected_color && `Color: ${item.selected_color}`}
                     </p>
-                    <p className="text-blue-600 font-bold">
+                    <p className="text-amber-400 font-bold">
                       ${item.product.price} each
                     </p>
                   </div>
@@ -180,24 +181,24 @@ const Cart = () => {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="bg-gray-200 px-3 py-1 rounded"
+                      className="bg-zinc-800 text-zinc-200 px-3 py-1 rounded-lg border border-zinc-700"
                     >
                       -
                     </button>
-                    <span className="w-8 text-center">{item.quantity}</span>
+                    <span className="w-8 text-center text-zinc-200">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="bg-gray-200 px-3 py-1 rounded"
+                      className="bg-zinc-800 text-zinc-200 px-3 py-1 rounded-lg border border-zinc-700"
                     >
                       +
                     </button>
                   </div>
-                  <p className="font-bold w-24 text-right">
+                  <p className="font-bold w-24 text-right text-zinc-100">
                     ${(item.quantity * item.product.price).toFixed(2)}
                   </p>
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="text-red-600 hover:text-red-800"
+                    className="text-red-400 hover:text-red-300 text-sm"
                   >
                     Remove
                   </button>
@@ -206,25 +207,25 @@ const Cart = () => {
             ))}
           </div>
 
-          <div className="bg-white shadow-md rounded-lg p-6">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-2xl font-bold">Total:</span>
-              <span className="text-2xl font-bold text-blue-600">
+              <span className="text-2xl font-bold text-zinc-100">Total</span>
+              <span className="text-2xl font-bold text-amber-400">
                 ${cart.total.toFixed(2)}
               </span>
             </div>
             <button
               onClick={() => setShowCheckout(true)}
-              className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
+              className="w-full bg-amber-500 text-zinc-950 px-6 py-3 rounded-xl font-semibold hover:bg-amber-400"
             >
               Proceed to Checkout
             </button>
           </div>
 
           {showCheckout && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                <h2 className="text-2xl font-bold mb-4">Checkout</h2>
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+              <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                <h2 className="font-display text-2xl font-bold mb-4 text-zinc-100">Checkout</h2>
                 <form onSubmit={handleCheckout}>
                   <div className="mb-4">
                     <label className="block font-semibold mb-2">
@@ -238,7 +239,7 @@ const Cart = () => {
                           shipping_address: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-4 py-2 border border-zinc-700 rounded-xl bg-zinc-950 text-zinc-100"
                       required
                       rows="3"
                     />
@@ -305,7 +306,7 @@ const Cart = () => {
                       onChange={(e) =>
                         setOrderData({ ...orderData, phone: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-4 py-2 border border-zinc-700 rounded-xl bg-zinc-950 text-zinc-100"
                     />
                   </div>
                   <div className="mb-4">
@@ -315,7 +316,7 @@ const Cart = () => {
                       onChange={(e) =>
                         setOrderData({ ...orderData, notes: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-4 py-2 border border-zinc-700 rounded-xl bg-zinc-950 text-zinc-100"
                       rows="2"
                     />
                   </div>
@@ -323,13 +324,13 @@ const Cart = () => {
                     <button
                       type="button"
                       onClick={() => setShowCheckout(false)}
-                      className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-400"
+                      className="flex-1 bg-zinc-800 text-zinc-200 px-4 py-2 rounded-xl font-semibold hover:bg-zinc-700 border border-zinc-700"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700"
+                      className="flex-1 bg-amber-500 text-zinc-950 px-4 py-2 rounded-xl font-semibold hover:bg-amber-400"
                     >
                       Place Order
                     </button>

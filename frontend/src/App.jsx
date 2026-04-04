@@ -27,9 +27,9 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <div className="min-h-screen" style={{ backgroundColor: '#f3f4f6' }}>
+        <div className="min-h-screen bg-zinc-950 text-zinc-100">
           <Navbar />
-        <main className="container mx-auto px-4 py-8 pt-0">
+        <main className="container mx-auto px-4 py-8 pt-6">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />

@@ -38,23 +38,23 @@ const Orders = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-zinc-700 border-t-amber-500"></div>
       </div>
     )
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">My Orders</h1>
+    <div className="max-w-4xl mx-auto">
+      <h1 className="font-display text-3xl font-bold mb-6 text-zinc-100">Orders</h1>
 
       {orders.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg mb-4">No orders yet</p>
+        <div className="text-center py-12 rounded-2xl border border-dashed border-zinc-700">
+          <p className="text-zinc-500 text-lg mb-4">No orders yet</p>
           <Link
             to="/products"
-            className="text-blue-600 hover:underline font-semibold"
+            className="text-amber-500 hover:text-amber-400 font-semibold"
           >
-            Browse Products
+            Shop shoes
           </Link>
         </div>
       ) : (
@@ -63,22 +63,22 @@ const Orders = () => {
             <Link
               key={order.id}
               to={`/orders/${order.id}`}
-              className="block bg-white/95 shadow-lg rounded-2xl p-6 transition-transform transition-shadow duration-200 hover:shadow-2xl hover:-translate-y-1"
+              className="block bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 transition hover:border-amber-500/30 hover:-translate-y-0.5"
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    Order #{order.order_number}
+                  <h3 className="text-xl font-semibold mb-2 text-zinc-100">
+                    #{order.order_number}
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-500 text-sm">
                     {new Date(order.created_at).toLocaleDateString()}
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-zinc-500 text-sm">
                     {order.order_items?.length || 0} item(s)
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-600 mb-2">
+                  <p className="text-2xl font-bold text-amber-400 mb-2">
                     ${order.total_amount}
                   </p>
                   <div className="space-x-2">

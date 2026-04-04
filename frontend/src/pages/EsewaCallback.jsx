@@ -55,7 +55,7 @@ const EsewaCallback = () => {
     <div className="max-w-xl mx-auto text-center py-12">
       <p className="text-gray-600">Processing your payment...</p>
       <div className="mt-4 flex justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-zinc-700 border-t-amber-500" />
       </div>
     </div>
   )

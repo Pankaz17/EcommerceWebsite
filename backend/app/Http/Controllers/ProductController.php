@@ -58,12 +58,9 @@ class ProductController extends Controller
             $query->where('price', '<=', $maxPrice);
         }
 
-        // Filter by size (size is stored as string: JSON or comma-separated)
+        // Filter by size (JSON array preferred — match quoted size to avoid "1" matching "11")
         if ($size = $request->get('size')) {
-            $query->where(function ($q) use ($size) {
-                $q->where('size', 'like', '%"' . $size . '"%')
-                    ->orWhere('size', 'like', '%' . $size . '%');
-            });
+            $query->where('size', 'like', '%"' . $size . '"%');
         }
 
         // Filter by brand
@@ -71,7 +68,12 @@ class ProductController extends Controller
             $query->where('brand', $brand);
         }
 
-        // Optional category filter
+        // Filter by color (exact match on stored display color)
+        if ($color = $request->get('color')) {
+            $query->where('color', $color);
+        }
+
+        // Optional category filter (shoe type: Running, Sneakers, Casual, Boots)
         if ($category = $request->get('category')) {
             $query->where('category', $category);
         }
@@ -178,6 +180,8 @@ class ProductController extends Controller
             'category' => 'nullable|string|max:100',
             'size' => 'nullable|string',
             'color' => 'nullable|string|max:50',
+            'material' => 'nullable|string|max:120',
+            'sole_type' => 'nullable|string|max:120',
             'stock_quantity' => 'required|integer|min:0',
             'status' => 'nullable|in:active,inactive',
         ]);
@@ -213,6 +217,8 @@ class ProductController extends Controller
             'category' => 'nullable|string|max:100',
             'size' => 'nullable|string',
             'color' => 'nullable|string|max:50',
+            'material' => 'nullable|string|max:120',
+            'sole_type' => 'nullable|string|max:120',
             'stock_quantity' => 'sometimes|required|integer|min:0',
             'status' => 'nullable|in:active,inactive',
         ]);

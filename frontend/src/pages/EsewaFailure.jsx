@@ -26,7 +26,7 @@ const EsewaFailure = () => {
       <div className="flex justify-center gap-4 mt-4">
         <Link
           to="/cart"
-          className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+          className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-amber-500 text-zinc-950 font-semibold hover:bg-amber-400"
         >
           Try Again
         </Link>

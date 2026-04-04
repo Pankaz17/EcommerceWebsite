@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../../services/api'
+import { productImageUrl } from '../../utils/productImage'
 
 const AdminProducts = () => {
   const navigate = useNavigate()
@@ -88,7 +89,7 @@ const AdminProducts = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {product.image && (
                     <img
-                      src={`http://127.0.0.1:8000/storage/${product.image}`}
+                      src={productImageUrl(product.image)}
                       alt={product.name}
                       className="h-16 w-16 object-cover rounded"
                       onError={(e) => {
