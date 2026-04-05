@@ -13,16 +13,16 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState("");
   const [message, setMessage] = useState("");
 
   const parseSizes = (raw) => {
     if (!raw && raw !== 0) return [];
-    if (Array.isArray(raw)) return raw;
+    if (Array.isArray(raw)) return raw.map(s => String(s));
     try {
       const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [parsed];
+      return Array.isArray(parsed) ? parsed.map(s => String(s)) : [String(parsed)];
     } catch (e) {
       if (typeof raw === "string") {
         return raw.includes(",") ? raw.split(",").map((s) => s.trim()) : [raw];
@@ -60,7 +60,7 @@ const ProductDetail = () => {
       await api.post("/cart", {
         product_id: product.id,
         quantity,
-        selected_size: selectedSize,
+        selected_size: selectedSize || null,
         selected_color: selectedColor || product.color || "",
       });
       refreshCartCount();
