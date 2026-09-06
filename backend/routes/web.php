@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     return response()->json([
+        'status' => true,
         'message' => 'Shoe Site API',
         'version' => '1.0.0',
     ]);
@@ -28,4 +29,3 @@ Route::get('/storage/{path}', function (string $path) {
 
     return Storage::disk('public')->response($path);
 })->where('path', '.*');
-
