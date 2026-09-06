@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Install system dependencies & PHP extensions needed by Laravel
+# Install system dependencies & PHP extensions
 RUN apt-get update && apt-get install -y \
     git curl libpng-dev libonig-dev libxml2-dev zip unzip nginx
 
@@ -11,16 +11,15 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copy existing application code
-COPY . .
+# Copy the backend code into the container
+COPY backend/ .
 
-# Install dependencies
+# Install dependencies inside backend directory
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions for Laravel storage and cache
+# Set permissions for storage and cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 80
 
-# Run migrations and start artisan server on container launch
 CMD php artisan config:cache && php artisan route:cache && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=80
