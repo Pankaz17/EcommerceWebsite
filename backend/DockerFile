@@ -11,13 +11,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copy the backend code into the container
-COPY backend/ .
+COPY . .
 
-# Install dependencies inside backend directory
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions for storage and cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 80
